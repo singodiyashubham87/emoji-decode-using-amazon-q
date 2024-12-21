@@ -3,8 +3,8 @@ import { Trophy } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/Button';
-import { BASE_URL } from '../BASE_URL';
 
+const BASE_URL = import.meta.env.VITE_BASE_URL
 export const Leaderboard = () => {
   const navigate = useNavigate();
   const [leaderboard, setLeaderboard] = useState([]);

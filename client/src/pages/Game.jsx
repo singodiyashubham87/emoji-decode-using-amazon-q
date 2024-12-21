@@ -3,8 +3,9 @@ import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "../components/Button";
 import { Input } from "../components/Input";
-import { BASE_URL } from "../BASE_URL";
 import Loader from "../components/Loader";
+
+const BASE_URL = import.meta.env.VITE_BASE_URL
 
 export const Game = () => {
   const location = useLocation();

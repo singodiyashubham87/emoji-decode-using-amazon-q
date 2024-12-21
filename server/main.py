@@ -5,6 +5,8 @@ import os
 import random
 from botocore.exceptions import ClientError
 from fastapi.middleware.cors import CORSMiddleware
+from decimal import Decimal
+
 
 app = FastAPI()
 
@@ -33,6 +35,16 @@ class GuessRequest(BaseModel):
 class Player(BaseModel):
     playerId: str
     score: int
+    
+    
+def convert_decimal(obj):
+    if isinstance(obj, Decimal):
+        return int(obj)
+    if isinstance(obj, list):
+        return [convert_decimal(i) for i in obj]
+    if isinstance(obj, dict):
+        return {k: convert_decimal(v) for k, v in obj.items()}
+    return obj
 
 @app.get("/")
 def read_root():
@@ -50,19 +62,35 @@ def get_puzzle():
     except ClientError as e:
         raise HTTPException(status_code=500, detail=str(e))
     
-    
 @app.get("/score/{player_id}")
 def get_player_score(player_id: str):
     try:
         response = scores_table.get_item(Key={"PlayerID": player_id})
+        print(response.get('Item', {}))
         if "Item" not in response:
             raise HTTPException(status_code=404, detail="Player not found")
-        print(response.get("Item", {}))
         player_data = response["Item"]
-        score = player_data.get("Score", 0)
-        return {"score": score}
+        return {"score": convert_decimal(player_data.get("Score", 0))}
     except ClientError as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
+@app.get("/player/{player_id}")
+def get_player(player_id: str):
+    try:
+        response = scores_table.get_item(Key={"PlayerID": player_id})
+        
+        if "Item" not in response:
+            raise HTTPException(status_code=404, detail="Player not found")
+
+        player_data = response["Item"]
+        return {"playerId": player_data["PlayerID"], "score": player_data.get("Score", 0)}
+
+    except ClientError as e:
+        raise HTTPException(status_code=500, detail=f"DynamoDB Error: {str(e)}")
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Unexpected Error: {str(e)}")
+
     
 @app.post("/player")
 def create_player(player: Player):
