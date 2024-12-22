@@ -78,6 +78,9 @@ export const Home = () => {
           About Game
         </Button>
       </div>
+      <div className="mt-8 space-x-4">
+      Made with ❤️ by <a href="https://shubham-s-socials.vercel.app/" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">Shubham Singodiya</a>
+      </div>
     </motion.div>
   );
 };
