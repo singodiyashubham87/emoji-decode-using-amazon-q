@@ -3,17 +3,23 @@ import { Trophy } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/Button';
+import { apiClient } from '../config/apiClient';
 
-const BASE_URL = import.meta.env.VITE_BASE_URL
 export const Leaderboard = () => {
   const navigate = useNavigate();
   const [leaderboard, setLeaderboard] = useState([]);
 
   useEffect(() => {
-    fetch(`${BASE_URL}/leaderboard`)
-      .then((res) => res.json())
-      .then((data) => setLeaderboard(data))
-      .catch((err) => console.error('Error fetching leaderboard:', err));
+    const fetchLeaderboard = async () => {
+      try {
+        const data = await apiClient.get('/leaderboard');
+        setLeaderboard(data);
+      } catch (err) {
+        console.error('Error fetching leaderboard:', err);
+      }
+    };
+
+    fetchLeaderboard();
   }, []);
 
   return (

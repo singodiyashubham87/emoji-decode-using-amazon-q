@@ -66,7 +66,6 @@ def get_puzzle():
 def get_player_score(player_id: str):
     try:
         response = scores_table.get_item(Key={"PlayerID": player_id})
-        print(response.get('Item', {}))
         if "Item" not in response:
             raise HTTPException(status_code=404, detail="Player not found")
         player_data = response["Item"]
@@ -126,7 +125,6 @@ def submit_guess(guess: GuessRequest):
 def get_leaderboard():
     try:
         response = scores_table.scan()
-        print(response)
         scores = response.get('Items', [])
         sorted_scores = sorted(scores, key=lambda x: x['Score'], reverse=True)
         return sorted_scores

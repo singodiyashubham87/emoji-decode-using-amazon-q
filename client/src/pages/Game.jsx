@@ -4,8 +4,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "../components/Button";
 import { Input } from "../components/Input";
 import Loader from "../components/Loader";
-
-const BASE_URL = import.meta.env.VITE_BASE_URL
+import { apiClient } from "../config/apiClient";
 
 export const Game = () => {
   const location = useLocation();
@@ -20,8 +19,8 @@ export const Game = () => {
     const fetchGameData = async () => {
       try {
         const [puzzleRes, scoreRes] = await Promise.all([
-          fetch(`${BASE_URL}/puzzle`).then((res) => res.json()),
-          fetch(`${BASE_URL}/score/${playerId}`).then((res) => res.json()),
+          apiClient.get("/puzzle"),
+          apiClient.get(`/score/${playerId}`),
         ]);
 
         setPuzzle(puzzleRes);
@@ -36,23 +35,22 @@ export const Game = () => {
     fetchGameData();
   }, [playerId]);
 
-  const handleSubmit = () => {
-    fetch(`${BASE_URL}/guess`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ playerId, guess }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        navigate("/result", {
-          state: {
-            isCorrect: data.correct,
-            playerId,
-            score: data.correct ? score + 10 : score,
-          },
-        });
-      })
-      .catch((err) => console.error("Error submitting guess:", err));
+  const handleSubmit = async () => {
+    if (!guess.trim()) return;
+
+    try {
+      const data = await apiClient.post("/guess", { playerId, guess });
+
+      navigate("/result", {
+        state: {
+          isCorrect: data.correct,
+          playerId,
+          score: data.correct ? score + 10 : score,
+        },
+      });
+    } catch (err) {
+      console.error("Error submitting guess:", err);
+    }
   };
 
   if (loading) {

@@ -4,8 +4,8 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../components/Button";
 import { Input } from "../components/Input";
+import { apiClient } from "../config/apiClient";
 
-const BASE_URL = import.meta.env.VITE_BASE_URL
 export const Home = () => {
   const [playerId, setPlayerId] = useState("");
   const [loading, setLoading] = useState(false);
@@ -17,27 +17,25 @@ export const Home = () => {
     setLoading(true);
 
     try {
-      // Check if the user exists in the database
-      const response = await fetch(`${BASE_URL}/player/${playerId}`, {
-        method: "GET",
-      });
-
-      if (response.status === 404) {
-        // Create the user if not found
-        await fetch(`${BASE_URL}/player`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ playerId, score: 0 }),
-        });
-      }
-
-      // Navigate to the Game page
-      navigate("/game", { state: { playerId } });
+      await apiClient.get(`/player/${playerId}`);
     } catch (err) {
-      console.error("Error starting the game:", err);
-    } finally {
-      setLoading(false);
+      if (err.message.includes("404")) {
+        try {
+          await apiClient.post("/player", { playerId, score: 0 });
+        } catch (err) {
+          console.error("Error creating the player:", err);
+          setLoading(false);
+          return;
+        }
+      } else {
+        console.error("Error fetching the player:", err);
+        setLoading(false);
+        return;
+      }
     }
+
+    navigate("/game", { state: { playerId } });
+    setLoading(false);
   };
 
   return (
