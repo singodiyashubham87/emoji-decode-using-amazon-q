@@ -19,7 +19,6 @@ export const Home = () => {
     try {
       await apiClient.get(`/player/${playerId}`);
     } catch (err) {
-      if (err.message.includes("404")) {
         try {
           await apiClient.post("/player", { playerId, score: 0 });
         } catch (err) {
@@ -27,11 +26,6 @@ export const Home = () => {
           setLoading(false);
           return;
         }
-      } else {
-        console.error("Error fetching the player:", err);
-        setLoading(false);
-        return;
-      }
     }
 
     navigate("/game", { state: { playerId } });
