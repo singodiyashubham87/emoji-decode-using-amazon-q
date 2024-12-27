@@ -32,15 +32,13 @@ The game consists of the following components:
 
 2. **Backend**:
    - Built using **FastAPI**.
-   - Hosted on **AWS EC2** with **Nginx** for SSL termination.
-   - SSL certificate provided for free by [Let's Encrypt](https://letsencrypt.org/). 🌐🔒
-
+   - Hosted on **AWS EC2** with help of **Nginx** & **Ngrok**.
 
 3. **Database**:
    - Uses **AWS DynamoDB** to manage emoji puzzles and player scores.
 
-4. **Domain**:
-   - Custom domain registered with **.tech** and DNS managed for deployment.
+4. **Tunnel**:
+   - **Ngrok** provided a tunnel to point `https` endpoint to my local `http` url.
 
 ---
 
@@ -106,7 +104,7 @@ Before running the project locally, ensure the following:
    - SSH into the EC2 instance.
    - Install Python, Gunicorn, and Nginx.
    - Set up a Gunicorn service for FastAPI.
-   - Configure Nginx for reverse proxy and SSL.
+   - Configure Nginx for reverse proxy and Ngrok for tunnelling.
 
 ### 2. Frontend (React + Vite + Tailwind)
 
